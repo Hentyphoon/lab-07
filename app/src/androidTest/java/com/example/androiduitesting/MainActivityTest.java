@@ -2,6 +2,8 @@ package com.example.androiduitesting;
 import static androidx.test.espresso.Espresso.onData;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
+import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
@@ -28,7 +30,7 @@ public class MainActivityTest {
     @Test
     public void testAddCity() {
         onView(withId(R.id.button_add)).perform(click());
-        onView(withId(R.id.editText_name)).perform(ViewActions.typeText("Edmonton"));
+        onView(withId(R.id.editText_name)).perform(typeText("Edmonton"));
         onView(withId(R.id.button_confirm)).perform(click());
         onView(withText("Edmonton")).check(matches(isDisplayed()));
     }
@@ -37,11 +39,11 @@ public class MainActivityTest {
     public void testClearCity(){
 // Add first city to the list
         onView(withId(R.id.button_add)).perform(click());
-        onView(withId(R.id.editText_name)).perform(ViewActions.typeText("Edmonton"));
+        onView(withId(R.id.editText_name)).perform(typeText("Edmonton"));
         onView(withId(R.id.button_confirm)).perform(click());
 //Add another city to the list
         onView(withId(R.id.button_add)).perform(click());
-        onView(withId(R.id.editText_name)).perform(ViewActions.typeText("Vancouver"));
+        onView(withId(R.id.editText_name)).perform(typeText("Vancouver"));
         onView(withId(R.id.button_confirm)).perform(click());
 //Clear the list
         onView(withId(R.id.button_clear)).perform(click());
@@ -52,7 +54,7 @@ public class MainActivityTest {
     public void testListView(){
 // Add a city
         onView(withId(R.id.button_add)).perform(click());
-        onView(withId(R.id.editText_name)).perform(ViewActions.typeText("Edmonton"));
+        onView(withId(R.id.editText_name)).perform(typeText("Edmonton"));
         onView(withId(R.id.button_confirm)).perform(click());
 // Check if in the Adapter view (given id of that adapter view), there is a data
 // (which is an instance of String) located at position zero.
@@ -60,5 +62,39 @@ public class MainActivityTest {
 // You can also use anything() in place of is(instanceOf(String.class))
         onData(is(instanceOf(String.class))).inAdapterView(withId(R.id.city_list
         )).atPosition(0).check(matches((withText("Edmonton"))));
+    }
+
+    @Test
+    public void testActivitySwitch() {
+        onView(withId(R.id.button_add)).perform(click());
+        onView(withId(R.id.editText_name)).perform(typeText("Edmonton"));
+        onView(withId(R.id.button_confirm)).perform(click());
+        onData(org.hamcrest.Matchers.is("Edmonton"))
+                .inAdapterView(withId(R.id.city_list))
+                .perform(click());
+        onView(withId(R.id.text_city)).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void testCityName() {
+        onView(withId(R.id.button_add)).perform(click());
+        onView(withId(R.id.editText_name)).perform(typeText("Edmonton"));
+        onView(withId(R.id.button_confirm)).perform(click());
+        onData(org.hamcrest.Matchers.is("Edmonton"))
+                .inAdapterView(withId(R.id.city_list))
+                .perform(click());
+        onView(withId(R.id.text_city)).check(matches(withText("Edmonton")));
+    }
+
+    @Test
+    public void testBackButton () {
+        onView(withId(R.id.button_add)).perform(click());
+        onView(withId(R.id.editText_name)).perform(typeText("Edmonton"));
+        onView(withId(R.id.button_confirm)).perform(click());
+        onData(org.hamcrest.Matchers.is("Edmonton"))
+                .inAdapterView(withId(R.id.city_list))
+                .perform(click());
+        onView(withId(R.id.button_back)).perform(click());
+        onView(withId(R.id.text_city)).check(matches(isDisplayed()));
     }
 }
